@@ -9,6 +9,7 @@ app = FastAPI()
 speed_model = joblib.load("speed_model.pkl")
 crash_model = joblib.load("crash_model.pkl")
 risk_model = joblib.load("risk_model.pkl")
+risk_rf_model = joblib.load("risk_rf_model.pkl")
 
 # Body schema for speed prediction
 class SpeedInput(BaseModel):
@@ -66,6 +67,22 @@ def predict_risk(data: RiskInput):
     pred = risk_model.predict(X)[0]
 
     # Convert model output to text label
+    risk_labels = {0: "LOW RISK", 1: "MEDIUM RISK", 2: "HIGH RISK"}
+
+    return {
+        "risk_level": int(pred),
+        "status": risk_labels[pred]
+    }
+
+
+# -----------------------------------------
+# 4️⃣ RISK PREDICTION WITH RANDOM FOREST
+# -----------------------------------------
+@app.post("/predict-risk-rf")
+def predict_risk_rf(data: RiskInput):
+    X = np.array([[data.speed, data.accel, data.brake, data.gyro, data.jerk]])
+    pred = risk_rf_model.predict(X)[0]
+
     risk_labels = {0: "LOW RISK", 1: "MEDIUM RISK", 2: "HIGH RISK"}
 
     return {

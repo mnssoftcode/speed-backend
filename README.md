@@ -86,3 +86,19 @@ To run this application locally:
    - 0: LOW RISK
    - 1: MEDIUM RISK
    - 2: HIGH RISK
+
+4. POST `/predict-risk-rf` - Predicts the risk level using a Random Forest model
+
+   The API expects the same JSON payload as the regular risk prediction endpoint:
+
+   ```json
+   {
+     "speed": 60.5,
+     "accel": 2.3,
+     "brake": 1.2,
+     "gyro": 0.1,
+     "jerk": 0.05
+   }
+   ```
+
+   The response format is identical to the regular risk prediction endpoint, with a risk level (0-2) and corresponding status.
