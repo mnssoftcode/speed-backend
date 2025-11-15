@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 import joblib
 import numpy as np
+import xgboost as xgb
 
 app = FastAPI()
 
@@ -10,6 +11,7 @@ speed_model = joblib.load("speed_model.pkl")
 crash_model = joblib.load("crash_model.pkl")
 risk_model = joblib.load("risk_model.pkl")
 risk_rf_model = joblib.load("risk_rf_model.pkl")
+risk_xgb_model = joblib.load("risk_xgb_model.pkl")
 
 # Body schema for speed prediction
 class SpeedInput(BaseModel):
@@ -87,5 +89,25 @@ def predict_risk_rf(data: RiskInput):
 
     return {
         "risk_level": int(pred),
+        "status": risk_labels[pred]
+    }
+
+
+# -----------------------------------------
+# 5️⃣ RISK PREDICTION WITH XGBOOST
+# -----------------------------------------
+@app.post("/predict-risk-xgb")
+def predict_risk_xgb(data: RiskInput):
+    X = np.array([[data.speed, data.accel, data.brake, data.gyro, data.jerk]])
+
+    # Convert to DMatrix
+    dinput = xgb.DMatrix(X)
+
+    pred = int(risk_xgb_model.predict(dinput)[0])
+
+    risk_labels = {0: "LOW RISK", 1: "MEDIUM RISK", 2: "HIGH RISK"}
+
+    return {
+        "risk_level": pred,
         "status": risk_labels[pred]
     }

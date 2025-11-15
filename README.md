@@ -102,3 +102,19 @@ To run this application locally:
    ```
 
    The response format is identical to the regular risk prediction endpoint, with a risk level (0-2) and corresponding status.
+
+5. POST `/predict-risk-xgb` - Predicts the risk level using an XGBoost model
+
+   The API expects the same JSON payload as the other risk prediction endpoints:
+
+   ```json
+   {
+     "speed": 60.5,
+     "accel": 2.3,
+     "brake": 1.2,
+     "gyro": 0.1,
+     "jerk": 0.05
+   }
+   ```
+
+   The response format is identical to the other risk prediction endpoints, with a risk level (0-2) and corresponding status.
