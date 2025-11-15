@@ -5,9 +5,10 @@ import numpy as np
 
 app = FastAPI()
 
-# Load both models
+# Load all models
 speed_model = joblib.load("speed_model.pkl")
 crash_model = joblib.load("crash_model.pkl")
+risk_model = joblib.load("risk_model.pkl")
 
 # Body schema for speed prediction
 class SpeedInput(BaseModel):
@@ -17,6 +18,15 @@ class SpeedInput(BaseModel):
 class CrashInput(BaseModel):
     speed: float
     accel: float
+    gyro: float
+    jerk: float
+
+
+# Body schema for risk prediction
+class RiskInput(BaseModel):
+    speed: float
+    accel: float
+    brake: float
     gyro: float
     jerk: float
 
@@ -44,4 +54,21 @@ def predict_crash(input: CrashInput):
     return {
         "crash_raw": int(pred),
         "status": result
+    }
+
+
+# -----------------------------------------
+# 3️⃣ RISK PREDICTION ENDPOINT
+# -----------------------------------------
+@app.post("/predict-risk")
+def predict_risk(data: RiskInput):
+    X = np.array([[data.speed, data.accel, data.brake, data.gyro, data.jerk]])
+    pred = risk_model.predict(X)[0]
+
+    # Convert model output to text label
+    risk_labels = {0: "LOW RISK", 1: "MEDIUM RISK", 2: "HIGH RISK"}
+
+    return {
+        "risk_level": int(pred),
+        "status": risk_labels[pred]
     }

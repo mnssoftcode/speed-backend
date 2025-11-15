@@ -60,3 +60,29 @@ To run this application locally:
    - `accel` is the acceleration
    - `gyro` is the gyroscope reading
    - `jerk` is the jerk (rate of change of acceleration)
+
+3. POST `/predict-risk` - Predicts the risk level based on driving parameters
+
+   The API expects a JSON payload with the following structure:
+
+   ```json
+   {
+     "speed": 60.5,
+     "accel": 2.3,
+     "brake": 1.2,
+     "gyro": 0.1,
+     "jerk": 0.05
+   }
+   ```
+
+   Where:
+   - `speed` is the current speed
+   - `accel` is the acceleration
+   - `brake` is the brake pressure
+   - `gyro` is the gyroscope reading
+   - `jerk` is the jerk (rate of change of acceleration)
+
+   The response will include a risk level (0-2) and a corresponding status:
+   - 0: LOW RISK
+   - 1: MEDIUM RISK
+   - 2: HIGH RISK
