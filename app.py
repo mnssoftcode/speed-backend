@@ -120,3 +120,28 @@ def predict_risk_xgb(data: RiskInput):
         "risk_level": int(pred),
         "status": risk_labels[int(pred)]
     }
+    
+# -----------------------------------------
+# 6️⃣ RISK PREDICTION WITH SVM (Lazy Load)
+# -----------------------------------------
+@app.post("/predict-risk-svm")
+def predict_risk_svm(data: RiskInput):
+    # Lazy load SVM + Scaler (heavy)
+    svm_model = joblib.load("risk_svm_model.pkl")
+    scaler = joblib.load("risk_svm_scaler.pkl")
+
+    # Prepare features
+    X = np.array([[data.speed, data.accel, data.brake, data.gyro, data.jerk]])
+
+    # Scale the input
+    X_scaled = scaler.transform(X)
+
+    # Predict
+    pred = svm_model.predict(X_scaled)[0]
+
+    risk_labels = {0: "LOW RISK", 1: "MEDIUM RISK", 2: "HIGH RISK"}
+
+    return {
+        "risk_level": int(pred),
+        "status": risk_labels[int(pred)]
+    }
