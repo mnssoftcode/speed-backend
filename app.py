@@ -3,6 +3,7 @@ from pydantic import BaseModel
 import joblib
 import numpy as np
 import xgboost as xgb
+import pandas as pd
 
 app = FastAPI()
 
@@ -98,10 +99,17 @@ def predict_risk_rf(data: RiskInput):
 # -----------------------------------------
 @app.post("/predict-risk-xgb")
 def predict_risk_xgb(data: RiskInput):
-    X = np.array([[data.speed, data.accel, data.brake, data.gyro, data.jerk]])
+    # Create dataframe with correct feature names
 
-    # Convert to DMatrix
-    dinput = xgb.DMatrix(X)
+    df_input = pd.DataFrame([{
+        "speed": data.speed,
+        "accel": data.accel,
+        "brake": data.brake,
+        "gyro": data.gyro,
+        "jerk": data.jerk
+    }])
+
+    dinput = xgb.DMatrix(df_input)
 
     pred = int(risk_xgb_model.predict(dinput)[0])
 
