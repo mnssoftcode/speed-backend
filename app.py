@@ -99,23 +99,15 @@ def predict_risk_rf(data: RiskInput):
 # -----------------------------------------
 @app.post("/predict-risk-xgb")
 def predict_risk_xgb(data: RiskInput):
-    # Create dataframe with correct feature names
 
-    df_input = pd.DataFrame([{
-        "speed": data.speed,
-        "accel": data.accel,
-        "brake": data.brake,
-        "gyro": data.gyro,
-        "jerk": data.jerk
-    }])
+    # Make numpy array with same feature order used during training
+    X = np.array([[data.speed, data.accel, data.brake, data.gyro, data.jerk]])
 
-    dinput = xgb.DMatrix(df_input)
-
-    pred = int(risk_xgb_model.predict(dinput)[0])
+    pred = risk_xgb_model.predict(X)[0]
 
     risk_labels = {0: "LOW RISK", 1: "MEDIUM RISK", 2: "HIGH RISK"}
 
     return {
-        "risk_level": pred,
-        "status": risk_labels[pred]
+        "risk_level": int(pred),
+        "status": risk_labels[int(pred)]
     }
